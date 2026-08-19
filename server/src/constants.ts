@@ -8,4 +8,14 @@ export const MESSAGES = {
 export const COMMAND_TYPES = {
   REG: 'reg',
   CREATE_GAME: 'create_game',
+  GAME_CREATED: 'game_created',
+  JOIN_GAME: 'join_game',
+  GAME_JOINED: 'game_joined',
+  PLAYER_JOINED: 'player_joined',
+  UPDATE_PLAYERS: 'update_players',
+  START_GAME: 'start_game',
+  QUESTION: 'question',
+  ANSWER: 'answer',
+  ANSWER_ACCEPTED: 'answer_accepted',
+  QUESTION_RESULT: 'question_result',
 };

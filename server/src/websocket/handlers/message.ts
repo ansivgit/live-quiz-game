@@ -1,16 +1,26 @@
-import type { WebSocket } from 'ws';
-import { login } from '../auth/auth';
+import type { WebSocket, WebSocketServer } from 'ws';
+import { handleEntry } from '@/websocket/auth/auth';
+import { createGame, gameProcess, joinGame, startGame } from '@/websocket/game';
 import type { WSMessage } from '@/types';
 import { COMMAND_TYPES } from '@/constants';
 
-export const handleMessage = (ws: WebSocket, msg: WSMessage): void => {
+export const handleMessage = (wss: WebSocketServer, ws: WebSocket, msg: WSMessage): void => {
   switch (msg.type) {
     case COMMAND_TYPES.REG:
-      login(ws, msg);
+      handleEntry(ws, msg);
       break;
     case COMMAND_TYPES.CREATE_GAME:
-      // createGame(ws);
+      createGame(ws, msg);
       break;
+    case COMMAND_TYPES.JOIN_GAME:
+      joinGame(ws, msg, wss);
+      break;
+    case COMMAND_TYPES.START_GAME:
+      startGame(msg, wss);
+      break;
+    // case COMMAND_TYPES.ANSWER:
+    //   gameProcess(ws, msg, wss);
+    //   break;
     default:
       console.log('Bad request');
   }

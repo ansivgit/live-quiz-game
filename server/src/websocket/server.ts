@@ -15,7 +15,7 @@ export const createWebSocketServer = (port: number) => {
       const message: WSMessage = JSON.parse(data.toString());
 
       console.log('Received:', message);
-      handleMessage(ws, message);
+      handleMessage(wss, ws, message);
     });
     
     ws.on('close', () => {
