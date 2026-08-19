@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import type { WebSocket } from 'ws';
 import type { Player } from '@/types';
 
 export class PlayersStore {
@@ -22,46 +23,45 @@ export class PlayersStore {
     );
   }
   
-  isPlayerExist(name: string) {
+  getPlayerByIndex(index: unknown): Player | undefined {
+    if (typeof index !== 'string' || !index.trim().length) {
+      return;
+    }
+    
+    return this.players.find(
+      (player) => player.index === index,
+    );
+  }
+  
+  isPlayerExist(name: string): boolean {
     if (this.getPlayerByName(name)) {
       console.info(`Player ${name} already exist!`);
-      console.log('From check: ', this.players);
-      
       return true;
     }
     return false;
   }
   
-  private register(name: string, password: string): Player {
+  private register(name: string, password: string, ws: WebSocket): Player {
     if (this.isPlayerExist(name)) {
-      console.log('From signIn: ', this.players);
-      return this.login(name, password);
+      return this.login(name, password, ws);
     }
     
     const newPlayerId: string = randomUUID();
-    const newPlayer: Player = { name, index: newPlayerId, score: 0 };
+    const newPlayer: Player = { name, index: newPlayerId, score: 0, ws };
     
     this.players.push(newPlayer);
-    console.log('Players', this.players);
-    
     return newPlayer;
   }
   
-  login(name: string, password: string): Player {
+  login(name: string, password: string, ws: WebSocket): Player {
     const registeredPlayer: Player | undefined = this.getPlayerByName(name);
-    console.log('From logIn: ', this.players);
     
     if (!registeredPlayer) {
-      return this.register(name, password);
+      return this.register(name, password, ws);
     }
-    
-    // if (registeredPlayer && registeredPlayer.password !== password) {
-    //   console.info(MESSAGES.invalidCreds);
-    //   return null;
-    // }
     
     return registeredPlayer;
   }
 }
 
-export const db = new PlayersStore();
+export const dbPlayers = new PlayersStore();
