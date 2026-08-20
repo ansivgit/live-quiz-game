@@ -2,10 +2,10 @@ import type { WebSocket } from 'ws';
 import { randomUUID } from 'node:crypto';
 import { dbGames, type GamesStore } from '@/db/games.store';
 import { dbQuestions, type QuestionsStore } from '@/db/questions.store';
-import { dbClients, type ClientsStore } from '@/websocket/clients.store';
-import { getResStringify, generateCode } from '@/utils';
+import { type ClientsStore, dbClients } from '@/websocket/clients.store';
+import { generateCode, getResStringify } from '@/utils';
 
-import type { WSMessage, Game, JoinGameData, StartGameData } from '@/types';
+import type { Game, JoinGameData, StartGameData, WSMessage } from '@/types';
 import { COMMAND_TYPES } from '@/constants';
 
 export const createGame = (ws: WebSocket, msg: WSMessage): void => {
@@ -13,6 +13,7 @@ export const createGame = (ws: WebSocket, msg: WSMessage): void => {
   const clientsStore: ClientsStore = dbClients;
   const gamesStore: GamesStore = dbGames;
   
+  //! add questions validation (assignment)
   const { questions } = msg.data;
   
   const hostUserId: string | null = clientsStore.getUser(ws);

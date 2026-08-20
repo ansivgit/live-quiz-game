@@ -2,10 +2,10 @@ import type { WebSocket, WebSocketServer } from 'ws';
 import { dbGames, type GamesStore } from '@/db/games.store';
 import { dbPlayers, type PlayersStore } from '@/db/players.store';
 import { broadcast } from '@/websocket/broadcast';
-import { dbClients, type ClientsStore } from '@/websocket/clients.store';
+import { type ClientsStore, dbClients } from '@/websocket/clients.store';
 import { getResStringify } from '@/utils';
 
-import type { WSMessage, StartGameData, Game, Player } from '@/types';
+import type { Game, Player, StartGameData, WSMessage } from '@/types';
 import { COMMAND_TYPES } from '@/constants';
 
 export const joinGame = (ws: WebSocket, msg: WSMessage, wss: WebSocketServer): void => {
@@ -13,6 +13,7 @@ export const joinGame = (ws: WebSocket, msg: WSMessage, wss: WebSocketServer): v
   const gamesStore: GamesStore = dbGames;
   const playersStore: PlayersStore = dbPlayers;
   
+  //! add code validation (assignment)
   const { code } = msg.data;
   
   const joinedUserId: string | null = clientsStore.getUser(ws);

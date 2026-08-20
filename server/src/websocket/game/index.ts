@@ -1,6 +1,6 @@
-import { createGame } from '../game/create';
-import { joinGame } from '../game/join';
-import { startGame } from '../game/start';
-import { gameProcess } from '../game/process';
+import { createGame } from './create';
+import { joinGame } from './join';
+import { startGame } from './start';
+import { gameSession } from './session';
 
-export { createGame, joinGame, startGame, gameProcess };
+export { createGame, joinGame, startGame, gameSession };

@@ -1,6 +1,6 @@
 import type { WebSocket, WebSocketServer } from 'ws';
 import { handleEntry } from '@/websocket/auth/auth';
-import { createGame, gameProcess, joinGame, startGame } from '@/websocket/game';
+import { createGame, gameSession, joinGame, startGame } from '@/websocket/game';
 import type { WSMessage } from '@/types';
 import { COMMAND_TYPES } from '@/constants';
 
@@ -18,9 +18,9 @@ export const handleMessage = (wss: WebSocketServer, ws: WebSocket, msg: WSMessag
     case COMMAND_TYPES.START_GAME:
       startGame(msg, wss);
       break;
-    // case COMMAND_TYPES.ANSWER:
-    //   gameProcess(ws, msg, wss);
-    //   break;
+    case COMMAND_TYPES.ANSWER:
+      gameSession(ws, msg, wss);
+      break;
     default:
       console.log('Bad request');
   }

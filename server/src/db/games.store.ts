@@ -1,4 +1,4 @@
-import { isCreateGamePayload } from '@/typeGuards';
+import { isCreateGamePayload } from '@/services/typeGuards';
 import type { Game } from '@/types';
 
 export class GamesStore {
