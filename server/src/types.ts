@@ -28,6 +28,15 @@ export interface Game {
   questionStartTime?: number;
   questionTimer?: NodeJS.Timeout;
   playerAnswers?: Map<string, { answerIndex: number; timestamp: number }>;
+  playersResult: Map<WebSocket, PlayerResult>;
+}
+
+export interface PlayerResult {
+  name: string;
+  answered: boolean;
+  correct: boolean;
+  pointsEarned: number;
+  totalScore: number;
 }
 
 export type GameStatus = 'waiting' | 'in_progress' | 'finished';

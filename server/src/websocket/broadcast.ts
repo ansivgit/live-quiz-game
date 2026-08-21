@@ -9,3 +9,5 @@ export const broadcast = (wss: WebSocketServer, message: unknown): void => {
     }
   }
 };
+
+export type GameBroadcast = typeof broadcast;

@@ -18,4 +18,5 @@ export const COMMAND_TYPES = {
   ANSWER: 'answer',
   ANSWER_ACCEPTED: 'answer_accepted',
   QUESTION_RESULT: 'question_result',
+  GAME_FINISHED: 'game_finished',
 };

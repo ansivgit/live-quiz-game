@@ -35,6 +35,7 @@ export const createGame = (ws: WebSocket, msg: WSMessage): void => {
       players: [],
       currentQuestion: 0,
       status: 'waiting',
+      playersResult: new Map(),
     };
     
     gamesStore.add(createdGame);
