@@ -24,15 +24,26 @@ export interface Game {
   questions: Question[];
   players: Player[];
   currentQuestion: number;
-  status: 'waiting' | 'in_progress' | 'finished';
+  status: GameStatus;
   questionStartTime?: number;
   questionTimer?: NodeJS.Timeout;
-  playerAnswers: Map<string, { answerIndex: number; timestamp: number }>;
+  playerAnswers?: Map<string, { answerIndex: number; timestamp: number }>;
+  playersResult: Map<WebSocket, PlayerResult>;
 }
+
+export interface PlayerResult {
+  name: string;
+  answered: boolean;
+  correct: boolean;
+  pointsEarned: number;
+  totalScore: number;
+}
+
+export type GameStatus = 'waiting' | 'in_progress' | 'finished';
 
 export interface User {
   name: string;
-  password: string;
+  // password: string;
   index: string;
   ws?: WebSocket;
 }
