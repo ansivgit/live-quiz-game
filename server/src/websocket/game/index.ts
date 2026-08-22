@@ -2,6 +2,6 @@ import { createGame } from './create';
 import { joinGame } from './join';
 import { startGame } from './startGame';
 import { gameSession } from './session';
-import { sendQuestionUpdate } from './sendQuestionUpdate';
+import { finishQuestion } from './finishQuestion';
 
-export { createGame, joinGame, startGame, gameSession, sendQuestionUpdate };
+export { createGame, joinGame, startGame, gameSession, finishQuestion };

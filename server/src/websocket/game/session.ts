@@ -1,21 +1,13 @@
 import type { WebSocket, WebSocketServer } from 'ws';
 import { dbGames, type GamesStore } from '@/db/games.store';
 import { dbPlayers, type PlayersStore } from '@/db/players.store';
+import { sendQuestionResult } from '@/websocket/broadcasts/sendQuestionResult';
 import { type ClientsStore, dbClients } from '@/websocket/clients.store';
 import { finishQuestion } from './finishQuestion';
-import { sendQuestionResult } from './sendQuestionResult';
 import { getResStringify } from '@/utils';
 
 import type { Game, Player, PlayerResult, Question, WSMessage } from '@/types';
-import { COMMAND_TYPES } from '@/constants';
-
-// type QuestionResult = {
-//   questionIndex: number;
-//   correctIndex: number;
-//   playerResults: PlayerResult[];
-// };
-
-const QUESTION_POINTS = 100;
+import { COMMAND_TYPES, QUESTION_POINTS, RESULT_DELAY } from '@/constants';
 
 export const gameSession = (ws: WebSocket, msg: WSMessage, wss: WebSocketServer): void => {
   const clientsStore: ClientsStore = dbClients;
@@ -60,10 +52,8 @@ export const gameSession = (ws: WebSocket, msg: WSMessage, wss: WebSocketServer)
     const points = player.answeredCorrectly ? QUESTION_POINTS : 0;
     player.score = playersStore.updateScore(player.index, points);
     
-    // game.currentQuestion = questionIndex;
-    
     game.questionTimer = setTimeout(() => {
-      finishQuestion(wss, gameId, questionIndex);
+      finishQuestion(wss, gameId);
     }, question.timeLimitSec * 1000);
     
     const playerResult: PlayerResult = {
@@ -76,7 +66,6 @@ export const gameSession = (ws: WebSocket, msg: WSMessage, wss: WebSocketServer)
     
     game.playersResult.set(ws, playerResult);
     
-    // console.log('🚀 session ~ game.players: ', game.players);
     if (game.players.every((p: Player) => p.hasAnswered)) {
       clearTimeout(game.questionTimer);
       game.questionTimer = undefined;
@@ -84,8 +73,8 @@ export const gameSession = (ws: WebSocket, msg: WSMessage, wss: WebSocketServer)
       sendQuestionResult(wss, gameId, questionIndex);
       
       game.questionTimer = setTimeout(() => {
-        finishQuestion(wss, gameId, questionIndex);
-      }, 7000);
+        finishQuestion(wss, gameId);
+      }, RESULT_DELAY);
     }
   } catch {
     console.error('Something wrong with answers, try later');

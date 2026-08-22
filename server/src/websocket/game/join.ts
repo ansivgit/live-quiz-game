@@ -1,7 +1,7 @@
 import type { WebSocket, WebSocketServer } from 'ws';
 import { dbGames, type GamesStore } from '@/db/games.store';
 import { dbPlayers, type PlayersStore } from '@/db/players.store';
-import { broadcast } from '@/websocket/broadcast';
+import { broadcast } from '@/websocket/broadcasts/broadcast';
 import { type ClientsStore, dbClients } from '@/websocket/clients.store';
 import { getResStringify } from '@/utils';
 

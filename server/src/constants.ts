@@ -26,3 +26,7 @@ export const GAME_STATUS = {
   PROGRESS: 'in_progress',
   FINISHED: 'finished',
 } as const;
+
+export const QUESTION_POINTS = 100;
+
+export const RESULT_DELAY = 5000;

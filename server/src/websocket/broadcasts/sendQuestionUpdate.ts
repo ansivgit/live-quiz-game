@@ -1,5 +1,5 @@
 import type { WebSocketServer } from 'ws';
-import { broadcast } from '@/websocket/broadcast';
+import { broadcast } from '@/websocket/broadcasts/broadcast';
 import type { Question } from '@/types';
 import { COMMAND_TYPES } from '@/constants';
 
@@ -10,7 +10,6 @@ interface QuestionPayload extends Omit<Question, 'correctIndex'> {
 
 export const sendQuestionUpdate = (wss: WebSocketServer, questions: Question[] = [], currentQuestion: number = 0): void => {
   try {
-    console.log('🚀 sendQuestionUpdate ~ game.currentQuestion: ', currentQuestion);
     const resData: QuestionPayload = {
       questionNumber: currentQuestion + 1,
       totalQuestions: questions.length,

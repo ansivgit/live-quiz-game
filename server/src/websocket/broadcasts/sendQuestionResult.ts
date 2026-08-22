@@ -1,6 +1,6 @@
 import type { WebSocketServer } from 'ws';
 import { dbGames } from '@/db/games.store';
-import { broadcast } from '@/websocket/broadcast';
+import { broadcast } from '@/websocket/broadcasts/broadcast';
 import type { Game, PlayerResult } from '@/types';
 import { COMMAND_TYPES } from '@/constants';
 

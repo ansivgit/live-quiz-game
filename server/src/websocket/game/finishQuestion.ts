@@ -1,20 +1,12 @@
 import type { WebSocketServer } from 'ws';
 import { dbGames } from '@/db/games.store';
+import { broadcast, sendQuestionUpdate } from '@/websocket/broadcasts';
 import { getPlayersScoreboard } from '@/services/getPlayersScoreboard';
-import { broadcast } from '@/websocket/broadcast';
-import { sendQuestionUpdate } from './sendQuestionUpdate';
-import { sendQuestionResult } from './sendQuestionResult';
 
 import type { Game } from '@/types';
-import { COMMAND_TYPES, GAME_STATUS } from '@/constants';
+import { COMMAND_TYPES, GAME_STATUS, RESULT_DELAY } from '@/constants';
 
-// type QuestionResult = {
-//   questionIndex: number;
-//   correctIndex: number;
-//   playerResults: PlayerResult[];
-// };
-
-export const finishQuestion = (wss: WebSocketServer, gameId: string, questionIndex: number): void => {
+export const finishQuestion = (wss: WebSocketServer, gameId: string): void => {
   const game: Game | undefined = dbGames.getGameById(gameId);
   if (!game) {
     console.error('Game not found');
@@ -30,7 +22,7 @@ export const finishQuestion = (wss: WebSocketServer, gameId: string, questionInd
     game.questionTimer = undefined;
   }
   
-  game.status = questionIndex < game.questions.length - 1 ? GAME_STATUS.PROGRESS : GAME_STATUS.FINISHED;
+  game.status = game.currentQuestion < game.questions.length - 1 ? GAME_STATUS.PROGRESS : GAME_STATUS.FINISHED;
   game.players.forEach((p) => {
     p.hasAnswered = false;
     p.answerTime = undefined;
@@ -38,9 +30,6 @@ export const finishQuestion = (wss: WebSocketServer, gameId: string, questionInd
   });
   
   if (game.status === GAME_STATUS.FINISHED) {
-    // console.log(555555);
-    sendQuestionResult(wss, gameId, game.currentQuestion);
-    
     game.questionTimer = setTimeout(() => {
       broadcast(wss, {
         type: COMMAND_TYPES.GAME_FINISHED,
@@ -49,12 +38,13 @@ export const finishQuestion = (wss: WebSocketServer, gameId: string, questionInd
         },
         id: 0,
       });
+      
       clearTimeout(game.questionTimer);
       game.questionTimer = undefined;
-    }, 7000);
+    }, RESULT_DELAY);
   } else {
-    game.currentQuestion = questionIndex + 1;
-    console.log('🚀 session-bottom ~ count: ', questionIndex);
+    game.currentQuestion += 1;
+    
     sendQuestionUpdate(wss, game.questions, game.currentQuestion);
   }
 };

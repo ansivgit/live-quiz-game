@@ -1,6 +1,6 @@
 import type { WebSocketServer } from 'ws';
 import { dbGames, type GamesStore } from '@/db/games.store';
-import { sendQuestionUpdate } from './sendQuestionUpdate';
+import { sendQuestionUpdate } from '@/websocket/broadcasts/sendQuestionUpdate';
 import type { Game, WSMessage } from '@/types';
 import { GAME_STATUS } from '@/constants';
 
