@@ -2,17 +2,18 @@ import type { WebSocket, WebSocketServer } from 'ws';
 import { dbGames, type GamesStore } from '@/db/games.store';
 import { dbPlayers, type PlayersStore } from '@/db/players.store';
 import { type ClientsStore, dbClients } from '@/websocket/clients.store';
+import { finishQuestion } from './finishQuestion';
+import { sendQuestionResult } from './sendQuestionResult';
 import { getResStringify } from '@/utils';
 
 import type { Game, Player, PlayerResult, Question, WSMessage } from '@/types';
 import { COMMAND_TYPES } from '@/constants';
-import { broadcast, type GameBroadcast } from '@/websocket/broadcast';
 
-type QuestionResult = {
-  questionIndex: number;
-  correctIndex: number;
-  playerResults: PlayerResult[];
-};
+// type QuestionResult = {
+//   questionIndex: number;
+//   correctIndex: number;
+//   playerResults: PlayerResult[];
+// };
 
 const QUESTION_POINTS = 100;
 
@@ -23,7 +24,7 @@ export const gameSession = (ws: WebSocket, msg: WSMessage, wss: WebSocketServer)
   
   const { gameId, questionIndex, answerIndex } = msg.data;
   
-  if (typeof questionIndex !== 'number' || typeof answerIndex !== 'number') {
+  if (typeof questionIndex !== 'number' || typeof answerIndex !== 'number' || typeof gameId !== 'string') {
     return;
   }
   
@@ -35,7 +36,7 @@ export const gameSession = (ws: WebSocket, msg: WSMessage, wss: WebSocketServer)
     return;
   }
   
-  const player: Player | undefined = playersStore.getPlayerByIndex(userId);
+  const player: Player | undefined = game.players.find((player: Player) => player.index === userId);
   if (!player) {
     console.error('Player not found');
     return;
@@ -55,12 +56,14 @@ export const gameSession = (ws: WebSocket, msg: WSMessage, wss: WebSocketServer)
     
     player.hasAnswered = true;
     player.answeredCorrectly = answerIndex === question.correctIndex;
-    const points = player.answeredCorrectly ? QUESTION_POINTS : 0;
     
-    game.currentQuestion = questionIndex;
+    const points = player.answeredCorrectly ? QUESTION_POINTS : 0;
+    player.score = playersStore.updateScore(player.index, points);
+    
+    // game.currentQuestion = questionIndex;
     
     game.questionTimer = setTimeout(() => {
-      finishQuestion(game, broadcast, 'timeout');
+      finishQuestion(wss, gameId, questionIndex);
     }, question.timeLimitSec * 1000);
     
     const playerResult: PlayerResult = {
@@ -68,60 +71,22 @@ export const gameSession = (ws: WebSocket, msg: WSMessage, wss: WebSocketServer)
       answered: player.hasAnswered,
       correct: player.answeredCorrectly,
       pointsEarned: points,
-      totalScore: player.score + points,
+      totalScore: player.score,
     };
     
     game.playersResult.set(ws, playerResult);
-    console.log('🚀 session ~ currentQuestion - end: ', game.currentQuestion);
     
-    const finishQuestion = (game: Game, broadcast: GameBroadcast, reason?: string) => {
-      if (game.status === 'finished') {
-        return;
-      }
-      
-      const questionResult: QuestionResult = {
-        questionIndex,
-        correctIndex: question.correctIndex,
-        playerResults: Array.from(game.playersResult.values()),
-      };
-      
+    // console.log('🚀 session ~ game.players: ', game.players);
+    if (game.players.every((p: Player) => p.hasAnswered)) {
       clearTimeout(game.questionTimer);
       game.questionTimer = undefined;
       
-      broadcast(wss, {
-        type: COMMAND_TYPES.QUESTION_RESULT,
-        data: questionResult,
-        id: 0,
-      });
+      sendQuestionResult(wss, gameId, questionIndex);
       
-      game.currentQuestion = game.currentQuestion + 1;
-      game.status = questionIndex === game.questions.length - 1 ? 'finished' : 'in_progress';
-      
-      if (game.status === 'finished') {
-        broadcast(wss, {
-          type: COMMAND_TYPES.GAME_FINISHED,
-          data: {
-            scoreboard: [],
-          },
-          id: 0,
-        });
-      } else {
-        console.log('🚀 session-bottom ~ currentQuestion: ', game.currentQuestion);
-        const resData = {
-          questionNumber: game.currentQuestion + 1,
-          totalQuestions: game.questions.length,
-          text: game.questions[game.currentQuestion].text,
-          options: game.questions[game.currentQuestion].options,
-          timeLimitSec: game.questions[game.currentQuestion].timeLimitSec,
-        };
-        
-        broadcast(wss, {
-          type: COMMAND_TYPES.QUESTION,
-          data: resData,
-          id: 0,
-        });
-      }
-    };
+      game.questionTimer = setTimeout(() => {
+        finishQuestion(wss, gameId, questionIndex);
+      }, 7000);
+    }
   } catch {
     console.error('Something wrong with answers, try later');
     return;
