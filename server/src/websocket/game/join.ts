@@ -39,7 +39,12 @@ export const joinGame = (ws: WebSocket, msg: WSMessage, wss: WebSocketServer): v
     ws.send(getResStringify(COMMAND_TYPES.GAME_JOINED, resData));
     
     const currentPlayersData = game.players.map((player: Player) => {
-      const { name, index, score } = player;
+      const storedPlayer: Player | undefined = playersStore.getPlayerByIndex(player.index);
+      if (!storedPlayer) {
+        throw new Error();
+      }
+      
+      const { name, index, score } = storedPlayer;
       return { name, index, score };
     })
     

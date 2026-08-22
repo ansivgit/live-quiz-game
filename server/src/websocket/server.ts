@@ -5,21 +5,21 @@ import type { WSMessage } from '@/types';
 export const createWebSocketServer = (port: number) => {
   const wss = new WebSocketServer(
     { port },
-    () => console.log(`WebSocket server started on ${port} port`),
+    () => console.info(`WebSocket server started on ${port} port`),
   );
   
   wss.on('connection', (ws: WebSocket) => {
-    console.log('New client connected');
+    console.info('New client connected');
     
     ws.on('message', (data) => {
       const message: WSMessage = JSON.parse(data.toString());
-
-      console.log('Received:', message);
+      
+      console.info('Received:', message);
       handleMessage(wss, ws, message);
     });
     
     ws.on('close', () => {
-      console.log('Client disconnected');
+      console.info('Client disconnected');
     });
     
     ws.on('error', (error) => {

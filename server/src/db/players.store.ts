@@ -62,6 +62,17 @@ export class PlayersStore {
     
     return registeredPlayer;
   }
+  
+  updateScore(playerId: string, score: number) {
+    const player: Player | undefined = this.getPlayerByIndex(playerId);
+    
+    if (!player) {
+      throw new Error('Cannot update score - player not found');
+    }
+    
+    player.score += score;
+    return player.score;
+  }
 }
 
 export const dbPlayers = new PlayersStore();

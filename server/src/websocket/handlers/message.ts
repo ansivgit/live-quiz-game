@@ -22,6 +22,6 @@ export const handleMessage = (wss: WebSocketServer, ws: WebSocket, msg: WSMessag
       gameSession(ws, msg, wss);
       break;
     default:
-      console.log('Bad request');
+      console.error('Bad request');
   }
 }

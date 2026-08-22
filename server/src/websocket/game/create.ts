@@ -6,7 +6,7 @@ import { type ClientsStore, dbClients } from '@/websocket/clients.store';
 import { generateCode, getResStringify } from '@/utils';
 
 import type { Game, JoinGameData, StartGameData, WSMessage } from '@/types';
-import { COMMAND_TYPES } from '@/constants';
+import { COMMAND_TYPES, GAME_STATUS } from '@/constants';
 
 export const createGame = (ws: WebSocket, msg: WSMessage): void => {
   const questionsStore: QuestionsStore = dbQuestions;
@@ -34,7 +34,8 @@ export const createGame = (ws: WebSocket, msg: WSMessage): void => {
       questions,
       players: [],
       currentQuestion: 0,
-      status: 'waiting',
+      status: GAME_STATUS.WAITING,
+      questionTimer: undefined,
       playersResult: new Map(),
     };
     

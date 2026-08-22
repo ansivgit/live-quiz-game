@@ -20,3 +20,9 @@ export const COMMAND_TYPES = {
   QUESTION_RESULT: 'question_result',
   GAME_FINISHED: 'game_finished',
 };
+
+export const GAME_STATUS = {
+  WAITING: 'waiting',
+  PROGRESS: 'in_progress',
+  FINISHED: 'finished',
+} as const;
